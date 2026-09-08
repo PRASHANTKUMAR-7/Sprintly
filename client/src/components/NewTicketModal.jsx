@@ -4,6 +4,7 @@ import Modal from './Modal';
 import useTicketStore from '../store/ticketStore';
 import useBoardStore from '../store/boardStore';
 import { PRIORITY_LABELS, getErrorMessage } from '../utils/helpers';
+import { notifyError } from '../utils/toast';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
@@ -30,19 +31,17 @@ export default function NewTicketModal({ onCreated }) {
   });
   const [attachments, setAttachments] = useState([]);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
 
   const reset = () => {
     setForm({ title: '', description: '', priority: 'medium', labels: '', dueDate: '', assignees: [] });
     setAttachments([]);
-    setError('');
   };
 
   const onFiles = async (e) => {
     const files = Array.from(e.target.files || []);
     for (const file of files) {
       if (file.size > MAX_FILE_BYTES) {
-        setError(`"${file.name}" exceeds the 5 MB limit`);
+        notifyError(`"${file.name}" exceeds the 5 MB limit`);
         continue;
       }
       const url = await readFileAsDataUrl(file);
@@ -67,7 +66,6 @@ export default function NewTicketModal({ onCreated }) {
   const submit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    setError('');
     try {
       const res = await api.post('/tickets', {
         board: newTicket.board,
@@ -85,7 +83,7 @@ export default function NewTicketModal({ onCreated }) {
       closeNewTicket();
       if (onCreated) onCreated();
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to create ticket'));
+      notifyError(getErrorMessage(err, 'Failed to create ticket'));
     } finally {
       setSaving(false);
     }
@@ -93,7 +91,6 @@ export default function NewTicketModal({ onCreated }) {
 
   return (
     <Modal open={!!newTicket} onClose={() => { reset(); closeNewTicket(); }} title="New Ticket" width="560px">
-      {error && <div className="alert alert-error">{error}</div>}
       <form onSubmit={submit}>
         <div className="form-group">
           <label>Title</label>

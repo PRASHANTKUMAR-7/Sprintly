@@ -7,6 +7,7 @@ import api from '../api/client';
 import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
 import { getErrorMessage } from '../utils/helpers';
+import { notifyError } from '../utils/toast';
 
 export default function DashboardPage() {
   const { workspaceId } = useParams();
@@ -29,7 +30,6 @@ export default function DashboardPage() {
   const [form, setForm] = useState({ name: '', description: '' });
   const [inviteCode, setInviteCode] = useState('');
   const [boardForm, setBoardForm] = useState({ name: '', description: '' });
-  const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -49,7 +49,6 @@ export default function DashboardPage() {
 
   const onSubmitCreate = async (e) => {
     e.preventDefault();
-    setError('');
     setSubmitting(true);
     try {
       const ws = await createWorkspace(form);
@@ -57,7 +56,7 @@ export default function DashboardPage() {
       setForm({ name: '', description: '' });
       navigate(`/w/${ws._id}`);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to create workspace'));
+      notifyError(getErrorMessage(err, 'Failed to create workspace'));
     } finally {
       setSubmitting(false);
     }
@@ -65,7 +64,6 @@ export default function DashboardPage() {
 
   const onSubmitJoin = async (e) => {
     e.preventDefault();
-    setError('');
     setSubmitting(true);
     try {
       const { workspace } = await joinByCode(inviteCode);
@@ -74,7 +72,7 @@ export default function DashboardPage() {
       setInviteCode('');
       navigate(`/w/${workspace._id}`);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to join workspace'));
+      notifyError(getErrorMessage(err, 'Failed to join workspace'));
     } finally {
       setSubmitting(false);
     }
@@ -82,7 +80,6 @@ export default function DashboardPage() {
 
   const onSubmitBoard = async (e) => {
     e.preventDefault();
-    setError('');
     setSubmitting(true);
     try {
       const board = await createBoard({ ...boardForm, workspace: workspaceId });
@@ -90,7 +87,7 @@ export default function DashboardPage() {
       setBoardForm({ name: '', description: '' });
       navigate(`/b/${board._id}`);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to create board'));
+      notifyError(getErrorMessage(err, 'Failed to create board'));
     } finally {
       setSubmitting(false);
     }
@@ -116,7 +113,7 @@ export default function DashboardPage() {
       const res = await api.post(`/workspaces/${workspaceId}/invite-code`);
       fetchWorkspace(workspaceId);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to regenerate invite code'));
+      notifyError(getErrorMessage(err, 'Failed to regenerate invite code'));
     }
   };
 
@@ -135,10 +132,10 @@ export default function DashboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <h1>Your Workspaces</h1>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn" onClick={() => { setError(''); setJoinOpen(true); }}>
+              <button className="btn" onClick={() => setJoinOpen(true)}>
                 Join with code
               </button>
-              <button className="btn btn-primary" onClick={() => { setError(''); setCreateOpen(true); }}>
+              <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
                 New workspace
               </button>
             </div>
@@ -189,7 +186,7 @@ export default function DashboardPage() {
               <button className="btn" onClick={fetchBoards.bind(null, workspaceId)}>
                 Refresh
               </button>
-              <button className="btn btn-primary" onClick={() => { setError(''); setBoardOpen(true); }}>
+              <button className="btn btn-primary" onClick={() => setBoardOpen(true)}>
                 New board
               </button>
             </div>
@@ -266,7 +263,6 @@ export default function DashboardPage() {
       )}
 
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Create Workspace">
-        {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={onSubmitCreate}>
           <div className="form-group">
             <label>Name</label>
@@ -288,7 +284,6 @@ export default function DashboardPage() {
       </Modal>
 
       <Modal open={joinOpen} onClose={() => setJoinOpen(false)} title="Join Workspace">
-        {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={onSubmitJoin}>
           <div className="form-group">
             <label>Invite code</label>
@@ -301,7 +296,6 @@ export default function DashboardPage() {
       </Modal>
 
       <Modal open={boardOpen} onClose={() => setBoardOpen(false)} title="Create Board">
-        {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={onSubmitBoard}>
           <div className="form-group">
             <label>Name</label>

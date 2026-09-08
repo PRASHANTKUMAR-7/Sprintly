@@ -5,13 +5,14 @@ import { Avatar } from './Avatar';
 import Spinner from './Spinner';
 import { useAuth } from '../context/AuthContext';
 import { PRIORITY_LABELS, PRIORITY_CLASS, formatDate, getErrorMessage } from '../utils/helpers';
+import { notifyError } from '../utils/toast';
 
 export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, members }) {
   const { user } = useAuth();
   const [ticket, setTicket] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
@@ -30,7 +31,8 @@ export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, me
         setTicket(tRes.data.data.ticket);
         setComments(cRes.data.data.comments);
       } catch (err) {
-        if (mounted) setError(getErrorMessage(err, 'Failed to load ticket'));
+        notifyError(getErrorMessage(err, 'Failed to load ticket'));
+        if (mounted) setError(true);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -55,7 +57,6 @@ export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, me
   const saveEdit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    setError('');
     try {
       const payload = {
         title: form.title,
@@ -72,7 +73,7 @@ export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, me
       setEditing(false);
       if (onRefresh) onRefresh();
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to save ticket'));
+      notifyError(getErrorMessage(err, 'Failed to save ticket'));
     } finally {
       setSaving(false);
     }
@@ -85,7 +86,7 @@ export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, me
       if (onRefresh) onRefresh();
       onClose();
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to delete ticket'));
+      notifyError(getErrorMessage(err, 'Failed to delete ticket'));
     }
   };
 
@@ -97,7 +98,7 @@ export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, me
       setComments([...comments, res.data.data.comment]);
       setCommentBody('');
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to post comment'));
+      notifyError(getErrorMessage(err, 'Failed to post comment'));
     }
   };
 
@@ -120,7 +121,7 @@ export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, me
       const res = await api.put(`/tickets/${ticketId}/watch`);
       setTicket(res.data.data.ticket);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to update watch status'));
+      notifyError(getErrorMessage(err, 'Failed to update watch status'));
     }
   };
 
@@ -131,7 +132,7 @@ export default function TicketDetail({ ticketId, boardId, onClose, onRefresh, me
           <Spinner size={28} />
         </div>
       ) : error ? (
-        <div className="alert alert-error">{error}</div>
+        <div className="empty-state">Ticket could not be loaded.</div>
       ) : (
         <div>
           {editing ? (
