@@ -115,4 +115,3 @@ Every endpoint returns `{ success, data }` on success or `{ success, error: { me
 | `client` | `npm run build`   | Production build         |
 | `client` | `npm run preview` | Preview production build |
 
-I kept **“Jira-style”** in the description because there it refers to the established style/category of the application, not your product name.
