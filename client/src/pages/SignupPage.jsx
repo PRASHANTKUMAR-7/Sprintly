@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/helpers';
+import PasswordInput from '../components/PasswordInput';
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -68,14 +69,22 @@ export default function SignupPage() {
             <label>Phone (optional)</label>
             <input type="tel" name="phone" value={form.phone} onChange={onChange} placeholder="+1 555 000 0000" />
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input type="password" name="password" value={form.password} onChange={onChange} required placeholder="At least 8 characters" />
-          </div>
-          <div className="form-group">
-            <label>Confirm password</label>
-            <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={onChange} required placeholder="Re-enter password" />
-          </div>
+          <PasswordInput
+            label="Password"
+            name="password"
+            value={form.password}
+            onChange={onChange}
+            required
+            placeholder="At least 8 characters"
+          />
+          <PasswordInput
+            label="Confirm password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={onChange}
+            required
+            placeholder="Re-enter password"
+          />
           <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
             {submitting ? 'Creating account…' : 'Sign up'}
           </button>

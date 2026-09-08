@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/helpers';
+import PasswordInput from '../components/PasswordInput';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -44,17 +45,14 @@ export default function LoginPage() {
               placeholder="you@example.com"
             />
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={onChange}
-              required
-              placeholder="••••••••"
-            />
-          </div>
+          <PasswordInput
+            label="Password"
+            name="password"
+            value={form.password}
+            onChange={onChange}
+            required
+            placeholder="••••••••"
+          />
           <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>
