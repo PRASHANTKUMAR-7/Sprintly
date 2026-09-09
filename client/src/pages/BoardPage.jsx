@@ -29,6 +29,7 @@ import NewTicketModal from '../components/NewTicketModal';
 import { TicketCardContent } from '../components/TicketCard';
 import { useAuth } from '../context/AuthContext';
 import { PRIORITY_LABELS, getErrorMessage } from '../utils/helpers';
+import { notifyError } from '../utils/toast';
 
 export default function BoardPage() {
   const { boardId } = useParams();
@@ -38,7 +39,6 @@ export default function BoardPage() {
 
   const canManage = myRole !== 'member';
 
-  const [error, setError] = useState('');
   const [columnModal, setColumnModal] = useState(false);
   const [columnForm, setColumnForm] = useState({ name: '', color: '#4f46e5', wipLimit: '' });
   const [editingColumn, setEditingColumn] = useState(null);
@@ -54,7 +54,7 @@ export default function BoardPage() {
   );
 
   useEffect(() => {
-    fetchBoard(boardId).catch(() => setError(getErrorMessage('Failed to load board')));
+    fetchBoard(boardId).catch((err) => notifyError(getErrorMessage(err, 'Failed to load board')));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardId]);
 
@@ -65,7 +65,6 @@ export default function BoardPage() {
 
   const onSubmitColumn = async (e) => {
     e.preventDefault();
-    setError('');
     try {
       if (editingColumn) {
         const res = await api.put(`/columns/${editingColumn._id}`, {
@@ -85,7 +84,7 @@ export default function BoardPage() {
       setColumnForm({ name: '', color: '#4f46e5', wipLimit: '' });
       setEditingColumn(null);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to save column'));
+      notifyError(getErrorMessage(err, 'Failed to save column'));
     }
   };
 
@@ -105,7 +104,7 @@ export default function BoardPage() {
       await api.delete(`/columns/${col._id}`);
       removeColumn(col._id);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to delete column'));
+      notifyError(getErrorMessage(err, 'Failed to delete column'));
     }
   };
 
@@ -208,7 +207,7 @@ export default function BoardPage() {
       }
     } catch (err) {
       // Roll back to server state on failure (the only recovery refresh).
-      setError(getErrorMessage(err, 'Failed to update order'));
+      notifyError(getErrorMessage(err, 'Failed to update order'));
       fetchBoard(boardId);
     }
   };
@@ -362,12 +361,6 @@ export default function BoardPage() {
           </button>
         )}
       </div>
-
-      {error && (
-        <div className="px-6 pt-3">
-          <div className="alert alert-error">{error}</div>
-        </div>
-      )}
 
       {/* Board body */}
       <DndContext

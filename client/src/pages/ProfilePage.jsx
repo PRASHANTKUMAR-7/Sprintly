@@ -2,6 +2,7 @@ import { useState } from 'react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/helpers';
+import { notifyError, notifySuccess } from '../utils/toast';
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
@@ -12,22 +13,18 @@ export default function ProfilePage() {
     avatarUrl: user.avatarUrl || '',
   });
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setMessage('');
     setSaving(true);
     try {
       const res = await api.put('/auth/me', form);
       updateUser(res.data.data.user);
-      setMessage('Profile updated');
+      notifySuccess('Profile updated');
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to update profile'));
+      notifyError(getErrorMessage(err, 'Failed to update profile'));
     } finally {
       setSaving(false);
     }
@@ -37,8 +34,6 @@ export default function ProfilePage() {
     <div className="container" style={{ maxWidth: 560 }}>
       <h1 style={{ marginBottom: 20 }}>Profile</h1>
       <div className="card">
-        {error && <div className="alert alert-error">{error}</div>}
-        {message && <div className="alert alert-success">{message}</div>}
         <form onSubmit={onSubmit}>
           <div className="form-group">
             <label>Email</label>

@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/helpers';
+import { notifyError } from '../utils/toast';
+import PasswordInput from '../components/PasswordInput';
+
+const PASSWORD_RULE_MESSAGE =
+  'Password must be at least 8 characters and contain letters, numbers, and a special character';
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -14,16 +19,18 @@ export default function SignupPage() {
     lastName: '',
     phone: '',
   });
-  const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(form.password)) {
+      notifyError(PASSWORD_RULE_MESSAGE);
+      return;
+    }
     if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match');
+      notifyError('Passwords do not match');
       return;
     }
     setSubmitting(true);
@@ -37,7 +44,7 @@ export default function SignupPage() {
       });
       navigate('/');
     } catch (err) {
-      setError(getErrorMessage(err, 'Signup failed'));
+      notifyError(getErrorMessage(err, 'Signup failed'));
     } finally {
       setSubmitting(false);
     }
@@ -48,7 +55,6 @@ export default function SignupPage() {
       <div className="card" style={{ width: 420 }}>
         <h2 style={{ marginBottom: 4 }}>Create account</h2>
         <p style={{ color: 'var(--muted)', marginTop: 0, marginBottom: 20 }}>Start managing your projects</p>
-        {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={onSubmit}>
           <div className="form-group">
             <label>Email</label>
@@ -68,14 +74,22 @@ export default function SignupPage() {
             <label>Phone (optional)</label>
             <input type="tel" name="phone" value={form.phone} onChange={onChange} placeholder="+1 555 000 0000" />
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input type="password" name="password" value={form.password} onChange={onChange} required placeholder="At least 8 characters" />
-          </div>
-          <div className="form-group">
-            <label>Confirm password</label>
-            <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={onChange} required placeholder="Re-enter password" />
-          </div>
+          <PasswordInput
+            label="Password"
+            name="password"
+            value={form.password}
+            onChange={onChange}
+            required
+            placeholder="At least 8 characters"
+          />
+          <PasswordInput
+            label="Confirm password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={onChange}
+            required
+            placeholder="Re-enter password"
+          />
           <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
             {submitting ? 'Creating account…' : 'Sign up'}
           </button>

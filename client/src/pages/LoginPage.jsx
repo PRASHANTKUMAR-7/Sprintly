@@ -2,25 +2,25 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/helpers';
+import { notifyError } from '../utils/toast';
+import PasswordInput from '../components/PasswordInput';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setSubmitting(true);
     try {
       await login(form.email, form.password);
       navigate('/');
     } catch (err) {
-      setError(getErrorMessage(err, 'Login failed'));
+      notifyError(getErrorMessage(err, 'Login failed'));
     } finally {
       setSubmitting(false);
     }
@@ -31,7 +31,6 @@ export default function LoginPage() {
       <div className="card" style={{ width: 380 }}>
         <h2 style={{ marginBottom: 4 }}>Welcome back</h2>
         <p style={{ color: 'var(--muted)', marginTop: 0, marginBottom: 20 }}>Sign in to Sprintly</p>
-        {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={onSubmit}>
           <div className="form-group">
             <label>Email</label>
@@ -44,17 +43,14 @@ export default function LoginPage() {
               placeholder="you@example.com"
             />
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={onChange}
-              required
-              placeholder="••••••••"
-            />
-          </div>
+          <PasswordInput
+            label="Password"
+            name="password"
+            value={form.password}
+            onChange={onChange}
+            required
+            placeholder="••••••••"
+          />
           <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>

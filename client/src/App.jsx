@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { useAuth } from './context/AuthContext';
 import Spinner from './components/Spinner';
 
@@ -27,56 +28,59 @@ export default function App() {
   const { user } = useAuth();
 
   return (
-    <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
-      <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignupPage />} />
+    <>
+      <Routes>
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignupPage />} />
 
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Topbar />
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/w/:workspaceId"
-        element={
-          <ProtectedRoute>
-            <Topbar />
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/b/:boardId"
-        element={
-          <ProtectedRoute>
-            <Topbar />
-            <BoardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/w/:workspaceId/members"
-        element={
-          <ProtectedRoute>
-            <Topbar />
-            <MembersPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <Topbar />
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Topbar />
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/w/:workspaceId"
+          element={
+            <ProtectedRoute>
+              <Topbar />
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/b/:boardId"
+          element={
+            <ProtectedRoute>
+              <Topbar />
+              <BoardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/w/:workspaceId/members"
+          element={
+            <ProtectedRoute>
+              <Topbar />
+              <MembersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Topbar />
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Toaster position="top-right" />
+    </>
   );
 }

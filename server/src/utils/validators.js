@@ -10,7 +10,14 @@ const idParam = Joi.object({
 const auth = {
   signup: Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().min(8).max(72).required(),
+    password: Joi.string()
+      .min(8)
+      .max(72)
+      .pattern(new RegExp('(?=.*[A-Za-z])'), 'letter')
+      .pattern(new RegExp('(?=.*\\d)'), 'number')
+      .pattern(new RegExp('(?=.*[^A-Za-z0-9])'), 'special')
+      .message('Password must be at least 8 characters and include at least one letter, one number, and one special character')
+      .required(),
     firstName: Joi.string().trim().max(60).allow('', null),
     lastName: Joi.string().trim().max(60).allow('', null),
     phone: Joi.string().trim().allow('', null),

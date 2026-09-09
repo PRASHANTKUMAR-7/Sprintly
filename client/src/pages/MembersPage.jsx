@@ -6,6 +6,7 @@ import { Avatar } from '../components/Avatar';
 import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
 import { getErrorMessage } from '../utils/helpers';
+import { notifyError } from '../utils/toast';
 
 const ROLE_BADGE = {
   owner: { bg: '#ede9fe', color: '#5b21b6' },
@@ -20,7 +21,6 @@ export default function MembersPage() {
   const [members, setMembers] = useState([]);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteForm, setInviteForm] = useState({ email: '', role: 'member' });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [inviting, setInviting] = useState(false);
 
@@ -38,7 +38,7 @@ export default function MembersPage() {
       setMembers(memRes.data.data.members);
       await fetchWorkspace(workspaceId);
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load members'));
+      notifyError(getErrorMessage(err, 'Failed to load members'));
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,6 @@ export default function MembersPage() {
 
   const onInvite = async (e) => {
     e.preventDefault();
-    setError('');
     setInviting(true);
     try {
       await api.post(`/workspaces/${workspaceId}/members`, inviteForm);
@@ -59,7 +58,7 @@ export default function MembersPage() {
       setInviteForm({ email: '', role: 'member' });
       await loadMembers();
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to invite member'));
+      notifyError(getErrorMessage(err, 'Failed to invite member'));
     } finally {
       setInviting(false);
     }
@@ -70,7 +69,7 @@ export default function MembersPage() {
       await api.put(`/workspaces/${workspaceId}/members/${member.memberId}`, { role });
       await loadMembers();
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to update role'));
+      notifyError(getErrorMessage(err, 'Failed to update role'));
     }
   };
 
@@ -80,7 +79,7 @@ export default function MembersPage() {
       await api.delete(`/workspaces/${workspaceId}/members/${member.memberId}`);
       await loadMembers();
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to remove member'));
+      notifyError(getErrorMessage(err, 'Failed to remove member'));
     }
   };
 
@@ -102,13 +101,11 @@ export default function MembersPage() {
           <h1 style={{ marginTop: 4 }}>Members</h1>
         </div>
         {amOwner && (
-          <button className="btn btn-primary" onClick={() => { setError(''); setInviteOpen(true); }}>
+          <button className="btn btn-primary" onClick={() => setInviteOpen(true)}>
             Invite member
           </button>
         )}
       </div>
-
-      {error && <div className="alert alert-error">{error}</div>}
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         {members.length === 0 ? (
@@ -174,7 +171,6 @@ export default function MembersPage() {
       </div>
 
       <Modal open={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite Member">
-        {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={onInvite}>
           <div className="form-group">
             <label>Email</label>
