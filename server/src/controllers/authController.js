@@ -118,6 +118,21 @@ const me = asyncHandler(async (req, res) => {
   return success(res, { user });
 });
 
+const googleCallback = async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.redirect(`${env.clientUrl}/login?oauth_error=google_authentication_failed`);
+  }
+
+  const accessToken = issueAccessToken(user._id.toString());
+  const refreshToken = await issueRefreshToken(user._id.toString());
+
+  const redirectUrl = new URL('/oauth-success', env.clientUrl);
+  redirectUrl.searchParams.set('accessToken', accessToken);
+  redirectUrl.searchParams.set('refreshToken', refreshToken);
+  return res.redirect(redirectUrl.toString());
+};
+
 const updateMe = asyncHandler(async (req, res) => {
   const { firstName, lastName, phone, avatarUrl } = req.body;
   const update = {};
@@ -130,4 +145,4 @@ const updateMe = asyncHandler(async (req, res) => {
   return success(res, { user });
 });
 
-module.exports = { signup, login, refresh, logout, me, updateMe };
+module.exports = { signup, login, refresh, logout, me, updateMe, googleCallback };
