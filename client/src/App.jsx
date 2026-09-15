@@ -5,6 +5,7 @@ import Spinner from './components/Spinner';
 
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import OAuthSuccessPage from './pages/OAuthSuccessPage';
 import DashboardPage from './pages/DashboardPage';
 import BoardPage from './pages/BoardPage';
 import ProfilePage from './pages/ProfilePage';
@@ -32,6 +33,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
         <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignupPage />} />
+        <Route path="/oauth-success" element={<OAuthSuccessPage />} />
 
         <Route
           path="/"
