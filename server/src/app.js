@@ -28,7 +28,9 @@ if (env.nodeEnv !== 'test') {
   app.use(morgan('dev'));
 }
 
-app.get('/health', (_req, res) => res.json({ success: true, data: { status: 'ok' } }));
+app.get('/health', (_req, res) => {
+  res.status(200).send('OK');
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/workspaces', workspaceRoutes);
