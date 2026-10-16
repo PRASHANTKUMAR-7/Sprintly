@@ -1,4 +1,5 @@
 # Sprintly
+**Plan smarter. Track progress. Ship faster.**
 <img width="1254" height="1254" alt="Sprintly_Logo_1" src="https://github.com/user-attachments/assets/b325d0b2-6f8a-48e1-9ffa-6994bf8d4a29" />
 
 
