@@ -199,9 +199,10 @@ const updateTicket = asyncHandler(async (req, res) => {
     }
   }
 
-  // Members can only edit tickets they created
-  if (membership.role === 'member' && ticket.reporter.toString() !== req.userId) {
-    return failure(res, 'Members can only edit their own tickets', 403);
+  // Members can only edit tickets they created or are assigned to
+  const isAssignee = (ticket.assignees || []).some((a) => a.toString() === req.userId);
+  if (membership.role === 'member' && ticket.reporter.toString() !== req.userId && !isAssignee) {
+    return failure(res, 'Members can only edit their own or assigned tickets', 403);
   }
 
   if (req.body.attachments !== undefined) {
