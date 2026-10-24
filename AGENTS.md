@@ -1,4 +1,4 @@
-# AGENTS.md — Jira (Lightweight Jira-Style Ticket System)
+# AGENTS.md — Sprintly (Lightweight Jira-Style Ticket System)
 
 This file guides AI agents and contributors working on this codebase. Read it before making changes.
 
@@ -17,7 +17,7 @@ A **Workspace** is the top-level container. Each workspace has its own boards, c
 ## Repository Layout
 
 ```
-Jira/
+Sprintly/
 ├── AGENTS.md            # This file
 ├── README.md            # Setup + run instructions
 ├── server/              # Express + Mongoose backend (CommonJS)
